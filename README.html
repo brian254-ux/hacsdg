@@ -1,0 +1,36 @@
+import nmap
+import openvas_lib
+
+# Define the target website
+target_website = "https://www.facebook.com"
+
+# Initialize Nmap
+nm = nmap.PortScanner()
+
+# Perform a vulnerability scan
+results = nm.scan(target_website, arguments="-sV --script vuln")
+
+# Print the vulnerability scan results
+print("Nmap Vulnerability Scan Results:")
+for host in nm.all_hosts():
+    print(f"Host: {host}")
+    for port in nm[host]['tcp']:
+        print(f"Port: {port}")
+        print(f"State: {nm[host]['tcp'][port]['state']}")
+        if 'vuln' in nm[host]['tcp'][port]:
+            print(f"Vulnerabilities: {nm[host]['tcp'][port]['vuln']}")
+        print()
+
+# Initialize OpenVAS
+openvas = openvas_lib.VulnscanManager("localhost", "admin", "openvas")
+
+# Perform a vulnerability scan
+vuln_results = openvas.launch_scan(target_website)
+
+# Print the OpenVAS vulnerability scan results
+print("OpenVAS Vulnerability Scan Results:")
+for result in vuln_results:
+    print(f"Vulnerability: {result.name}")
+    print(f"Severity: {result.severity}")
+    print(f"Description: {result.description}")
+    print()
